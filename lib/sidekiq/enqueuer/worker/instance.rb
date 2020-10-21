@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sidekiq
   module Enqueuer
     module Worker
@@ -7,8 +9,8 @@ module Sidekiq
         def initialize(job, enqueue_using_async)
           @job = job
           @enqueue_using_async = enqueue_using_async
-          @instance_method     = deduce_instance_method
-          @params              = deduce_params
+          @instance_method = deduce_instance_method
+          @params = deduce_params
         end
 
         def trigger(input_params)
@@ -38,7 +40,9 @@ module Sidekiq
         end
 
         def deduce_params
-          worker_params.empty? ? [] : worker_params.map { |e| Sidekiq::Enqueuer::Worker::Param.new(e[1], e[0]) }
+          return [] if worker_params.empty?
+
+          worker_params.map { |e| Sidekiq::Enqueuer::Worker::Param.new(e[1], e[0]) }
         end
 
         def worker_params

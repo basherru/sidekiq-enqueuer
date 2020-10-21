@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 module Sidekiq
   module Enqueuer
     class Configuration
       attr_accessor :jobs, :enqueue_using_async
 
-      IGNORED_CLASSES = %w(Sidekiq::Extensions
+      IGNORED_CLASSES = %w[Sidekiq::Extensions
                            Sidekiq::Extensions::DelayedModel
                            Sidekiq::Extensions::DelayedMailer
                            Sidekiq::Extensions::DelayedClass
-                           ActiveJob::QueueAdapters).freeze
+                           ActiveJob::QueueAdapters].freeze
 
       def initialize(enqueue_using_async = nil)
         @enqueue_using_async = true if enqueue_using_async.nil?
@@ -44,7 +46,11 @@ module Sidekiq
 
       # Load all classes from the included application before selecting Jobs from it
       def rails_eager_load
-        ::Rails.application.eager_load! if defined?(::Rails) && ::Rails.respond_to?(:env) && !::Rails.env.production?
+        return unless defined?(::Rails)
+        return unless ::Rails.respond_to?(:env)
+        return if ::Rails.env.production?
+
+        ::Rails.application.eager_load!
       end
     end
   end
