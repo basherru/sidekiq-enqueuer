@@ -21,7 +21,7 @@ module Sidekiq
           when active_job?
             job.perform_later(*args_with_values)
           else
-            raise UnsupportedJobType
+            raise UnsupportedJobType, "Unsupported job type: #{job}"
           end
         end
 
@@ -32,7 +32,7 @@ module Sidekiq
           when active_job?
             job.set(wait: time_in_seconds).perform_later(*args_with_values)
           else
-            raise UnsupportedJobType
+            raise UnsupportedJobType, "Unsupported job type: #{job}"
           end
         end
 

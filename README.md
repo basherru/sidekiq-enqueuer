@@ -27,11 +27,14 @@ Optionally, provide a list of Jobs to display on the new tab, on a new initializ
 Worry not, when no configuration is provided, all jobs will be displayed.
 
 ```ruby
-# config/initializers/sidekiq_enqueuer_config.rb
+# config/initializers/sidekiq_enqueuer.rb
 require "sidekiq/enqueuer"
 
 Sidekiq::Enqueuer.configure do |config|
-  config.jobs_yielder = -> { [MyAwesomeJob1, MyModule::MyAwesomeJob2] }
+  # string/symbol literals are used to when you prefer not to resolve job constants
+  config.jobs = %w[MyAwesomeJob1 MyModule::MyAwesomeJob2]
+  # you can use constants array as well 
+  # config.jobs = [MyAwesomeJob1, MyModule::MyAwesomeJob2]
 end
 
 ```

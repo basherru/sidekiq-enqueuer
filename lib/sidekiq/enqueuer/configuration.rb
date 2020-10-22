@@ -3,6 +3,8 @@
 module Sidekiq
   module Enqueuer
     class Configuration
+      class UnsupportedJobType < StandardError; end
+
       attr_accessor :jobs, :async
 
       IGNORED_CLASSES = %w[Sidekiq::Extensions
@@ -24,7 +26,18 @@ module Sidekiq
       def provided_or_default_jobs
         return application_jobs if jobs.nil?
 
-        jobs.map(&:constantize)
+        jobs.map { |job| constantize_if_needed(job) }
+      end
+
+      def constantize_if_needed(job)
+        case job
+        when Class
+          job
+        when String, Symbol
+          Object.const_get(job)
+        else
+          raise UnsupportedJobType, "Unsupported job type: #{job}"
+        end
       end
 
       def sort(jobs)
