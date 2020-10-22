@@ -16,13 +16,11 @@ on:
 jobs:
   test-25:
     runs-on: ubuntu-latest
-
     services:
       redis:
         image: redis
         ports:
           - 6379/tcp
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up Ruby
@@ -33,17 +31,12 @@ jobs:
         run: bundle install
       - name: Run tests
         run: bundle exec rake
-        env:
-          REDIS_URL: redis
-
 
   test-26:
     runs-on: ubuntu-latest
-
     services:
       redis:
         image: redis
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up Ruby
@@ -54,16 +47,12 @@ jobs:
         run: bundle install
       - name: Run tests
         run: bundle exec rake
-        env:
-          REDIS_URL: redis
 
   test-27:
     runs-on: ubuntu-latest
-
     services:
       redis:
         image: redis
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up Ruby
@@ -74,5 +63,3 @@ jobs:
         run: bundle install
       - name: Run tests
         run: bundle exec rake
-        env:
-          REDIS_URL: redis
