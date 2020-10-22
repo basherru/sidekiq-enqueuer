@@ -7,11 +7,11 @@ module Sidekiq
 
       attr_accessor :jobs, :async
 
-      IGNORED_CLASSES = %w[Sidekiq::Extensions
-                           Sidekiq::Extensions::DelayedModel
+      IGNORED_CLASSES = %w[Sidekiq::Extensions::DelayedModel
                            Sidekiq::Extensions::DelayedMailer
                            Sidekiq::Extensions::DelayedClass
-                           ActiveJob::QueueAdapters].freeze
+                           ApplicationJob
+                           ActiveJob::QueueAdapters::SidekiqAdapter::JobWrapper].freeze
 
       def initialize(async: true)
         @async = async
