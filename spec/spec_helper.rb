@@ -16,7 +16,7 @@ require "simplecov"
 require "timecop"
 
 ENV["RACK_ENV"] = "test" # skip Rack Protection
-REDIS = Sidekiq::RedisConnection.create(url: "redis://localhost/15")
+REDIS = Sidekiq::RedisConnection.create(url: "redis://#{ENV.fetch("REDIS_URL", "localhost")}/15")
 Sidekiq.logger.level = Logger::ERROR
 
 ActiveJob::Base.queue_adapter = :sidekiq
