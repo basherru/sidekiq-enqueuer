@@ -47,6 +47,14 @@ RSpec.describe Sidekiq::Enqueuer::Worker::Trigger do
         expect(trigger.enqueue).to be_truthy
       end
     end
+
+    context "with unknown job type" do
+      subject(:trigger) { described_class.new(Class.new, []) }
+
+      it "raises corresponding error" do
+        expect { trigger.enqueue }.to raise_error(described_class::UnsupportedJobType)
+      end
+    end
   end
 
   describe "#enqueue_in" do
@@ -63,10 +71,18 @@ RSpec.describe Sidekiq::Enqueuer::Worker::Trigger do
     context "with an ActiveJob" do
       subject(:trigger) { described_class.new(HardJob, []) }
 
-      before { expect(HardJob).to receive(:perform_later).and_return(true) }
+      before { expect(HardJob).to receive_message_chain(:set, :perform_later).and_return(true) }
 
       it "expects enqueue to be called" do
-        expect(trigger.enqueue).to be_truthy
+        expect(trigger.enqueue_in(1)).to be_truthy
+      end
+    end
+
+    context "with unknown job type" do
+      subject(:trigger) { described_class.new(Class.new, []) }
+
+      it "raises corresponding error" do
+        expect { trigger.enqueue_in(1) }.to raise_error(described_class::UnsupportedJobType)
       end
     end
   end
