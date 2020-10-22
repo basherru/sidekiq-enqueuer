@@ -14,51 +14,32 @@ on:
     branches: [ master ]
 
 jobs:
-  test-25:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu, macos ]
+        ruby: [ 2.5, 2.6, 2.7 ]
+    runs-on: ${{ matrix.os }}-latest
+
     services:
       redis:
         image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
           - 6379/tcp
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.5
-      - name: Install dependencies
-        run: bundle install
-      - name: Run tests
-        run: bundle exec rake
 
-  test-26:
-    runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis
     steps:
       - uses: actions/checkout@v2
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.6
-      - name: Install dependencies
-        run: bundle install
-      - name: Run tests
-        run: bundle exec rake
-
-  test-27:
-    runs-on: ubuntu-latest
-    services:
-      redis:
-        image: redis
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
       - name: Install dependencies
         run: bundle install
       - name: Run tests
