@@ -3,14 +3,14 @@
 RSpec.describe Sidekiq::Enqueuer::Worker::Instance do
   describe "#initializer" do
     context "with perform with parameters" do
-      subject(:instance) { described_class.new(HardWorker, false) }
+      subject(:instance) { described_class.new(HardWorker, async: false) }
 
       it "expects to have a defined perform_method" do
         expect(instance.instance_method).to eq(:perform)
       end
 
-      it "expects to have a defined enqueue_using_async" do
-        expect(instance.enqueue_using_async).to be_falsey
+      it "expects to have a correct async attr " do
+        expect(instance.async).to be_falsey
       end
 
       it "expects to deduce perform method params correctly" do
@@ -21,14 +21,14 @@ RSpec.describe Sidekiq::Enqueuer::Worker::Instance do
     end
 
     context "with perform without parameters" do
-      subject(:instance) { described_class.new(WorkerWithNoParams, false) }
+      subject(:instance) { described_class.new(WorkerWithNoParams, async: false) }
 
       it "expects to have a defined perform_method" do
         expect(instance.instance_method).to eq(:perform)
       end
 
-      it "expects to have a defined enqueue_using_async" do
-        expect(instance.enqueue_using_async).to be_falsey
+      it "expects to have a currect async attr" do
+        expect(instance.async).to be_falsey
       end
 
       it "expects perform method params to be empty" do
@@ -37,14 +37,14 @@ RSpec.describe Sidekiq::Enqueuer::Worker::Instance do
     end
 
     context "with a method different than perform" do
-      subject(:instance) { described_class.new(WorkerWithPerformAsync, false) }
+      subject(:instance) { described_class.new(WorkerWithPerformAsync, async: false) }
 
       it "expects to have a defined perform_method" do
         expect(instance.instance_method).to eq(:perform_async)
       end
 
-      it "expects to have a defined enqueue_using_async" do
-        expect(instance.enqueue_using_async).to be_falsey
+      it "expects to have a correct async attr" do
+        expect(instance.async).to be_falsey
       end
 
       it "expects to deduce perform method params correctly" do
@@ -56,7 +56,7 @@ RSpec.describe Sidekiq::Enqueuer::Worker::Instance do
   end
 
   describe "#trigger" do
-    subject(:instance) { described_class.new(HardWorker, false) }
+    subject(:instance) { described_class.new(HardWorker, async: false) }
 
     before { expect(Sidekiq::Client).to receive(:enqueue_to).and_return(true) }
 
@@ -66,7 +66,7 @@ RSpec.describe Sidekiq::Enqueuer::Worker::Instance do
   end
 
   describe "#trigger_in" do
-    subject(:instance) { described_class.new(HardWorker, false) }
+    subject(:instance) { described_class.new(HardWorker, async: false) }
 
     before { expect(Sidekiq::Client).to receive(:enqueue_to_in).and_return(true) }
 
@@ -76,7 +76,7 @@ RSpec.describe Sidekiq::Enqueuer::Worker::Instance do
   end
 
   describe "#name" do
-    subject(:instance) { described_class.new(HardWorker, false) }
+    subject(:instance) { described_class.new(HardWorker, async: false) }
 
     it "expects to have the correct name" do
       expect(instance.name).to eq("HardWorker")
@@ -84,7 +84,7 @@ RSpec.describe Sidekiq::Enqueuer::Worker::Instance do
   end
 
   describe "#trigger_method" do
-    subject(:instance) { described_class.new(HardWorker, false) }
+    subject(:instance) { described_class.new(HardWorker, async: false) }
 
     it "expects to return an instance of Trigger klass" do
       expect(instance.send(:trigger_job, [])).to be_an_instance_of(

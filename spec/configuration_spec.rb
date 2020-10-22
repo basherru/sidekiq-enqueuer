@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe Sidekiq::Enqueuer::Configuration do
-  describe "#all_jobs" do
-    subject { config.all_jobs }
+  describe "#jobs" do
+    subject { config.available_jobs }
 
-    before { config.jobs = [NoParamWorker, HardWorker] }
+    before { config.jobs = %w[NoParamWorker HardWorker] }
 
     let(:config) { described_class.new }
 

@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-require "sidekiq/enqueuer"
+require_relative "sidekiq_enqueuer"

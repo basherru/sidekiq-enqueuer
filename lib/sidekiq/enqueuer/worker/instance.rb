@@ -4,11 +4,11 @@ module Sidekiq
   module Enqueuer
     module Worker
       class Instance
-        attr_reader :job, :instance_method, :params, :enqueue_using_async
+        attr_reader :job, :instance_method, :params, :async
 
-        def initialize(job, enqueue_using_async)
+        def initialize(job, async:)
           @job = job
-          @enqueue_using_async = enqueue_using_async
+          @async = async
           @instance_method = deduce_instance_method
           @params = deduce_params
         end

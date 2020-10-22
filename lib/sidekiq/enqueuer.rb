@@ -21,10 +21,9 @@ module Sidekiq
         yield(configuration)
       end
 
-      def all_jobs
-        included_jobs = defined?(@all_jobs) ? @all_jobs : configuration.all_jobs
-        included_jobs.each_with_object([]) do |job_klass, acc|
-          acc << Worker::Instance.new(job_klass, configuration.enqueue_using_async)
+      def jobs
+        configuration.available_jobs.map do |job|
+          Worker::Instance.new(job, async: configuration.async)
         end
       end
     end

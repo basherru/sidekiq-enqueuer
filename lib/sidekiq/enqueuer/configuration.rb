@@ -3,7 +3,7 @@
 module Sidekiq
   module Enqueuer
     class Configuration
-      attr_accessor :jobs, :enqueue_using_async
+      attr_accessor :jobs, :async
 
       IGNORED_CLASSES = %w[Sidekiq::Extensions
                            Sidekiq::Extensions::DelayedModel
@@ -11,41 +11,44 @@ module Sidekiq
                            Sidekiq::Extensions::DelayedClass
                            ActiveJob::QueueAdapters].freeze
 
-      def initialize(enqueue_using_async = nil)
-        @enqueue_using_async = true if enqueue_using_async.nil?
+      def initialize(async: true)
+        @async = async
       end
 
-      def all_jobs
-        @jobs = defined?(@jobs) ? sort(@jobs) : sort(application_jobs)
+      def available_jobs
+        sort(provided_or_default_jobs)
       end
 
       private
 
-      def sort(all_jobs)
-        all_jobs.sort_by(&:name)
+      def provided_or_default_jobs
+        return application_jobs if jobs.nil?
+
+        jobs.map(&:constantize)
+      end
+
+      def sort(jobs)
+        jobs.sort_by(&:name)
       end
 
       # Loads all jobs within the application after an eager_load
       # Filters Sidekiq system Jobs
       def application_jobs
-        rails_eager_load
-        all_jobs = []
-        all_jobs << sidekiq_jobs
-        all_jobs << active_jobs if defined?(::ActiveJob)
-        all_jobs = all_jobs.flatten
-        all_jobs.delete_if { |klass| IGNORED_CLASSES.include?(klass.to_s) }
+        rails_eager_load!
+        jobs = [*sidekiq_jobs, *active_jobs].flatten
+        jobs.reject { |klass| IGNORED_CLASSES.include?(klass.to_s) }
       end
 
       def sidekiq_jobs
-        ObjectSpace.each_object(Class).select { |k| k.included_modules.include?(::Sidekiq::Worker) }
+        ObjectSpace.each_object(Class).select { |job| Sidekiq::Enqueuer::Utils.sidekiq_job?(job) }
       end
 
       def active_jobs
-        ObjectSpace.each_object(Class).select { |k| k.superclass == ::ActiveJob::Base }
+        ObjectSpace.each_object(Class).select { |job| Sidekiq::Enqueuer::Utils.active_job?(job) }
       end
 
       # Load all classes from the included application before selecting Jobs from it
-      def rails_eager_load
+      def rails_eager_load!
         return unless defined?(::Rails)
         return unless ::Rails.respond_to?(:env)
         return if ::Rails.env.production?

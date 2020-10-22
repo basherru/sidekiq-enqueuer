@@ -1,18 +1,19 @@
 # frozen_string_literal: true
 
-require "sidekiq/web"
-
 RSpec.describe Sidekiq::Enqueuer::WebExtension::Loader do
-  include Rack::Test::Methods
-
-  subject(:app) { Sidekiq::Web }
+  include_context "web extension api context"
 
   before { Timecop.freeze("1970-01-01 00:00:00") }
 
   before do
     Sidekiq.redis = REDIS
     Sidekiq.redis(&:flushdb)
-    Sidekiq::Enqueuer.configure { |config| config.jobs = [NoParamWorker, HardWorker, HardJob] }
+  end
+
+  before do
+    Sidekiq::Enqueuer.configure do |config|
+      config.jobs = %w[NoParamWorker HardWorker HardJob]
+    end
   end
 
   describe "GET /" do

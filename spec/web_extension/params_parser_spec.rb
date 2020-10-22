@@ -2,7 +2,9 @@
 
 RSpec.describe Sidekiq::Enqueuer::WebExtension::ParamsParser do
   let(:parser) { described_class.new(params, worker) }
-  let(:worker) { Sidekiq::Enqueuer::Worker::Instance.new(WorkerWithOptionalParams, false) }
+  let(:worker) do
+    Sidekiq::Enqueuer::Worker::Instance.new(WorkerWithOptionalParams, async: false)
+  end
 
   describe "#initializer" do
     subject(:parsed_params) { parser.raw_params }

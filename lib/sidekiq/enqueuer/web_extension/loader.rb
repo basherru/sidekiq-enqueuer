@@ -11,7 +11,7 @@ module Sidekiq
           view_path = File.join(File.expand_path("..", __dir__), "views")
 
           app.get "/enqueuer" do
-            @jobs = Sidekiq::Enqueuer.all_jobs
+            @jobs = Sidekiq::Enqueuer.jobs
 
             render(:erb, File.read(File.join(view_path, "index.erb")))
           end

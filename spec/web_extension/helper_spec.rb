@@ -16,7 +16,9 @@ end
 
 RSpec.describe Sidekiq::Enqueuer::WebExtension::Helper do
   let(:helper) { TestHelperClass.new }
-  let(:worker) { Sidekiq::Enqueuer::Worker::Instance.new(WorkerWithOptionalParams, false) }
+  let(:worker) do
+    Sidekiq::Enqueuer::Worker::Instance.new(WorkerWithOptionalParams, async: false)
+  end
 
   describe "#get_params_by_action" do
     context "with valid params for the required action" do
@@ -38,7 +40,9 @@ RSpec.describe Sidekiq::Enqueuer::WebExtension::Helper do
 
   describe "#find_job_by_class_name" do
     before do
-      Sidekiq::Enqueuer.configure { |config| config.jobs = [NoParamWorker, HardWorker] }
+      Sidekiq::Enqueuer.configure do |config|
+        config.jobs = %w[NoParamWorker HardWorker]
+      end
     end
 
     context "providing a valid job name" do
